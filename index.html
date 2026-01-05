@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Управление</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  background: linear-gradient(180deg, #6ec6ff, #b3e5fc);
+  overflow: hidden;
+}
+
+/* Волны */
+.wave {
+  position: absolute;
+  width: 200%;
+  height: 200px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 100%;
+  animation: wave 10s infinite linear;
+}
+
+.wave1 { top: 60%; animation-duration: 18s; }
+.wave2 { top: 70%; animation-duration: 25s; opacity: 0.1; }
+
+@keyframes wave {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Карточка */
+.card {
+  position: relative;
+  z-index: 10;
+  max-width: 320px;
+  margin: 60px auto;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  text-align: center;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+/* Поле IP + галочка */
+.input-wrap {
+  position: relative;
+  margin-bottom: 14px;
+}
+
+.input-wrap input {
+  width: 100%;
+  padding: 12px 44px 12px 12px;
+  font-size: 18px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Галочка */
+.save-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #4caf50;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.save-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* Основные кнопки */
+button.main {
+  width: 100%;
+  height: 55px;
+  font-size: 18px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #2196f3;
+  color: white;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wave wave1"></div>
+<div class="wave wave2"></div>
+
+<!-- ВХОД -->
+<div class="card" id="login">
+  <h2>Вход</h2>
+  <input id="password" type="password" placeholder="Пароль">
+  <button class="main" onclick="login()">Войти</button>
+</div>
+
+<!-- ОСНОВНОЙ ЭКРАН -->
+<div class="card" id="main" style="display:none;">
+  <h2>Управление</h2>
+
+  <div class="input-wrap">
+    <input id="host" placeholder="IP:PORT">
+    <button class="save-btn" onclick="saveIP()">✔</button>
+  </div>
+
+  <button class="main" onclick="sendCmd('/r1')">Ворота</button>
+  <button class="main" onclick="sendCmd('/r2')">Калитка</button>
+  <button class="main" onclick="sendCmd('/r3')">Гараж</button>
+</div>
+
+<script>
+// ✅ SHA-256 хэш пароля 9495
+const PASSWORD_HASH =
+  "8a30f2af5db424a81f3fd0ca89d9f3e6fc723f88e92020934e4abf52e3a44467";
+
+// Автовход
+if (localStorage.getItem("auth") === "ok") {
+  showMain();
+}
+
+// SHA-256
+async function sha256(text) {
+  const buf = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest("SHA-256", buf);
+  return [...new Uint8Array(hash)]
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function login() {
+  const input = document.getElementById("password").value;
+  const hash = await sha256(input);
+
+  if (hash === PASSWORD_HASH) {
+    localStorage.setItem("auth", "ok");
+    showMain();
+  } else {
+    alert("Неверный пароль");
+  }
+}
+
+function showMain() {
+  document.getElementById("login").style.display = "none";
+  document.getElementById("main").style.display = "block";
+  document.getElementById("host").value = localStorage.getItem("host") || "";
+}
+
+function saveIP() {
+  const host = document.getElementById("host").value.trim();
+  if (!host) {
+    alert("Введите IP:PORT");
+    return;
+  }
+  localStorage.setItem("host", host);
+}
+
+function sendCmd(cmd) {
+  const host = document.getElementById("host").value.trim();
+  if (!host) {
+    alert("Введите IP:PORT");
+    return;
+  }
+  fetch("http://" + host + cmd)
+    .catch(() => alert("Ошибка соединения"));
+}
+</script>
+
+</body>
+</html>
