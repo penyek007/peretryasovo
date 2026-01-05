@@ -1,6 +1,6 @@
 {
-  "name": "Управление",
-  "short_name": "Управление",
+  "name": "WiFi контроллер",
+  "short_name": "WiFi контроллер",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#6ec6ff",
@@ -19,3 +19,4 @@
     }
   ]
 }
+
