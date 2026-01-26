@@ -1,7 +1,7 @@
-self.addEventListener("install", e => {
+self.addEventListener("install", event => {
   self.skipWaiting();
 });
 
-self.addEventListener("fetch", e => {
-  // offline не используем
+self.addEventListener("fetch", event => {
+  // Ничего не перехватываем
 });
