@@ -1,118 +1,41 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Remote Control</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Remote Control</title>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1e3c72">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e3c72">
 
-<style>
-html,body{
-  margin:0;
-  height:100%;
-  font-family:Arial;
-}
-body{
-  background:linear-gradient(180deg,#dce3ea,#b7cff2);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.panel{
-  width:100%;
-  max-width:360px;
-  padding:20px;
-  text-align:center;
-}
-.auth{
-  display:flex;
-  margin-bottom:14px;
-  border:3px solid #1e3c72;
-  border-radius:14px;
-  background:#1e3c72;
-}
-.auth input{
-  flex:1;
-  padding:12px;
-  border:none;
-  border-radius:10px 0 0 10px;
-  font-size:16px;
-}
-.auth button{
-  width:70px;
-  border:none;
-  border-radius:0 10px 10px 0;
-  background:#f0f0f0;
-  font-size:16px;
-}
-.main-btn{
-  width:100%;
-  height:70px;
-  margin:10px 0;
-  font-size:20px;
-  background:#1e3c72;
-  color:white;
-  border:none;
-  border-radius:18px;
-}
-.main-btn:disabled{
-  opacity:.5;
-}
-</style>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #1e3c72;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
+    }
+  </style>
 </head>
 
 <body>
-<div class="panel">
 
-  <div class="auth">
-    <input type="password" id="pwd" placeholder="Пароль">
-    <button onclick="auth()">OK</button>
-  </div>
-
-  <button class="main-btn" disabled onclick="send(1,this)">Ворота</button>
-  <button class="main-btn" disabled onclick="send(2,this)">Калитка</button>
-  <button class="main-btn" disabled onclick="send(3,this)">Гараж</button>
-  <button class="main-btn" disabled onclick="send(4,this)">Не используется</button>
-
-</div>
+<!-- 🔥 ВАЖНО: только открываем ESP -->
+<iframe src="http://94.198.134.161:1000"></iframe>
 
 <script>
-const ESP_URL = "http://http://94.198.134.161:1000"; // <<< IP ESP8266
-
-const buttons = document.querySelectorAll(".main-btn");
-
-function setButtons(state){
-  buttons.forEach(b => b.disabled = !state);
-}
-
-function auth(){
-  const p = pwd.value;
-  fetch(`${ESP_URL}/check?p=` + encodeURIComponent(p), {
-    credentials: "include"
-  }).then(r=>{
-    setButtons(r.ok);
-  });
-}
-
-function send(n,btn){
-  btn.disabled = true;
-  fetch(`${ESP_URL}/relay?num=${n}`, {
-    credentials: "include"
-  }).finally(()=>{
-    setTimeout(()=>btn.disabled=false,2000);
-  });
-}
-
-// авто-вход по cookie
-fetch(`${ESP_URL}/auth`, { credentials:"include" })
-  .then(r=>{ if(r.ok) setButtons(true); });
-
-// service worker
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("sw.js");
-}
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
 </script>
+
 </body>
 </html>
