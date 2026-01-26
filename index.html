@@ -6,35 +6,47 @@
   <title>Remote Control</title>
 
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1e3c72">
+  <meta name="theme-color" content="#b71c1c">
 
   <style>
-    body{
+    html,body{
       margin:0;
-      height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:linear-gradient(180deg,#dce3ea,#b7cff2);
+      width:100%;
+      height:100%;
       font-family:Arial;
     }
 
+    body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(180deg,#f5d0d0,#e57373);
+    }
+
     .enter-btn{
-      width:200px;
-      height:200px;
+      width:220px;
+      height:220px;
       border-radius:50%;
       border:none;
-      background:#1e3c72;
+      background:#b71c1c;
       color:white;
-      font-size:28px;
+      font-size:32px;
+      font-weight:bold;
       cursor:pointer;
-      box-shadow:0 10px 30px rgba(0,0,0,0.25);
+      box-shadow:0 12px 35px rgba(0,0,0,0.35);
       transition:transform .15s, box-shadow .15s;
     }
 
     .enter-btn:active{
       transform:scale(0.95);
-      box-shadow:0 6px 18px rgba(0,0,0,0.3);
+      box-shadow:0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    .timer{
+      position:absolute;
+      bottom:40px;
+      font-size:16px;
+      opacity:0.7;
     }
   </style>
 </head>
@@ -42,24 +54,32 @@
 <body>
 
 <button class="enter-btn" onclick="openESP()">Вход</button>
+<div class="timer" id="timer">Автовход через 5 сек</div>
 
 <script>
 const ESP_URL = "http://94.198.134.161:1000";
+let seconds = 5;
 
 function openESP(){
   window.location.href = ESP_URL;
 }
 
-// авто-вход через 5 секунды
-setTimeout(openESP, 5000);
+// таймер
+const label = document.getElementById("timer");
+const t = setInterval(()=>{
+  seconds--;
+  label.textContent = "Автовход через " + seconds + " сек";
+  if(seconds <= 0){
+    clearInterval(t);
+    openESP();
+  }
+},1000);
 
-// регистрация SW
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+// service worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
 }
 </script>
 
 </body>
 </html>
-
-
